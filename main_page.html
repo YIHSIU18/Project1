@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Booking a table</title>
+    <style>
+    * {
+      font-family: arial, sans-serif;
+    }
+    #bookForm {
+      background: #f7f7f7;
+      padding: 20px;
+      max-width: 500px;
+    }
+    #bookForm * {
+      box-sizing: border-box;
+    }
+    #bookForm input, #bookForm label {
+      display: block;
+      width: 100%;
+    }
+    #bookForm input {
+      padding: 10px;
+    }
+    #bookForm label {
+      padding: 10px 0;
+    }
+    #bookForm input[type="submit"] {
+      margin-top: 20px;
+      border: 0;
+      color: #fff;
+      background: red;
+      cursor: pointer;
+    }
+    #bookForm input[type="submit"]:disabled { background: #424242; }
+    </style>
+</head>
+<body>
+    <!--stop error "favicon.ico"-->
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <!--booking form-->
+    <h2>Green bird restaurant</h2>
+    <form id="bookForm" onsubmit="return book();"> 
+    <label for="name">Name</label>  
+    <input type="text" name="name" required/><br>
+
+    <label for="email">Email</label>
+    <input type="email" name="email" required/><br>
+
+    <label for="date">Date</label>
+    <input type="date" name="date" id="date"required/><br>
+
+    <label for="time">Time</label>
+    <input type="time" name="time" id="time" required/><br>
+
+    <label for="people">People</label>
+    <input type="number" name="people" min="2" max="10" required/><br>
+
+    <input type="submit" value="Book" id="bookNow"/>
+    </form>
+
+  
+<script>
+
+//SEND BOOK
+function book()
+{   
+    //prevent multtiple submit
+    document.getElementById("bookNow").disabled = true;
+    
+    //collect form data
+    var data = new FormData(document.getElementById("bookForm"));
+
+    //Send
+    //Time
+    var hrServiceMidiStart = '12:00';
+    var hrServiceMidiEnd = '15:00';
+    var hrServiceSoirStart = '18:30';
+    var hrServiceSoirEnd = '21:00';
+
+    var obj = 
+    {
+      startTime: '11:30',
+      endTime: '22:00'
+    }
+
+    var deviation = [{s:'12:00',e:'15:00'},{s:'18:30',e:'21:00'}];
+    var GivenTime = document.getElementById("time").value; 
+
+    //date
+    var GivenDate = new Date(document.getElementById("date").value);//reserach return variable form "date"
+    var CurrentDate = new Date();
+
+    if((GivenTime >= hrServiceMidiStart 
+    && GivenTime <= hrServiceMidiEnd) 
+    || (GivenTime >= hrServiceSoirStart 
+    && GivenTime <= hrServiceSoirEnd) 
+    || ((GivenDate >= CurrentDate) == true))
+    {
+      fetch("http://127.0.0.1:89/book", {method:"POST", body:data}).then((res) =>
+      {
+        if(res.status==200){location.href="http://127.0.0.1:89/thankyou";}
+        else{alert("Opps an error!");}
+      })
+      .catch((err)=> {alert("Opps2 an error has occured."+err.status);});
+      return false;
+    }else
+    {
+      alert("Booking failed!");
+    }
+   
+    window.onload = () => 
+    {
+        //Min selectable date is today
+        let datepick = document.getElementsByName("date")[0];
+        datepick.min = new Date().toISOString().split("T")[0];
+    }
+
+    //Enable form
+    document.getElementById("bookNow").disabled = false;
+};
+
+</script>
+</body>
+</html>
